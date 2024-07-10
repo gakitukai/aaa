@@ -5,25 +5,42 @@ using UnityEngine;
 public class FieldScript : MonoBehaviour
 {
     public GameObject Field;
-    //ここでpublicと宣言することで後でInspectorビューから操作できる
-    float timer = 0;
-    float spowntime = 2; //2秒ごとに生成させる
+    GameObject[] step = new GameObject[10];
+    float speed = 10;
+    float disappear = -10;
+    float respawn = 30;
+
+    void Start()
+    {
+        for (int i = 0; i < step.Length; i++)
+        {
+            step[i] = Instantiate(Field, new Vector3(4 * i, 0, 0), Quaternion.identity);
+        }
+    }
 
     void Update()
     {
-        timer += Time.deltaTime; //timerの値を1秒に1のペースで増やす
-        if (timer > spowntime) {
-            PlaneGenerate(); //PlaneGenerate関数を呼び出す。
-            timer = 0; //timerを0に戻す。
+        for (int i = 0; i < step.Length; i++)
+        {
+            step[i].gameObject.transform.position -= new Vector3(speed * Time.deltaTime, 0, 0);
+            if (step[i].gameObject.transform.position.x < disappear)
+            {
+                ChangeScale(i);
+                step[i].gameObject.transform.position = new Vector3(respawn, 0, 0);
+            }
         }
-        }
-
-    void PlaneGenerate()
-    {
-        Instantiate(Field, new Vector3(1, 0, 0), Quaternion.identity);   // Start is called before the first frame update
-        
     }
-}
+    void ChangeScale(int i)
+    {
+        int x = (i + 9) % 10; //(i+9)を10で割った余りをxとする。
+        if (step[x].transform.localScale.y == 0.5)
+        {
+            step[i].transform.localScale = step[x].transform.localScale + new Vector3(0, Random.Range(0, 2), 0);
+        }
+        else
+        {
+            step[i].transform.localScale = step[x].transform.localScale + new Vector3(0, Random.Range(-1, 2), 0);
+        }
+    }
 
- 
-
+} // Start is called before the first frame update
